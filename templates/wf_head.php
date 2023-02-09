@@ -13,6 +13,6 @@
     <!-- <script src="<?php //echo CD_PLUGIN_URL. '/assets/js/dashbord-script.js';?>" id="jquery-dasshscript-js"></script> -->
     <script src="<?php echo CD_PLUGIN_URL. '/assets/js/willed-script.js';?>" id="jquery-willed-js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js" id="jquery-easing-js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&key=AIzaSyAPsOcMqj3xpY-p4_oGJ4IA-i0G7ySAgTs&callback=initlocMap"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&key=&callback=initlocMap"></script>
 
 </head>
