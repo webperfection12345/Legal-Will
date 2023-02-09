@@ -1,0 +1,291 @@
+<?php 
+if(isset($_GET['will'])){
+	$queryurlval = $_GET['will'];
+	if(!empty($queryurlval) && $queryurlval!=''){
+		echo $queryurlval;
+	}
+}
+
+$primaryExedata = get_user_meta($user_id, 'primary_executor_submitted_data',true);
+$backupExedata = get_user_meta($user_id, 'backup_executor_submitted_data',true);
+//print_r($primaryExedata);
+$exename = $primaryExedata['primary_executor_name'];
+$bkupExe = $backupExedata['backup_executor_name'];
+
+$willdePartners = get_user_meta($user_id, 'willed_partners',true);
+?> 
+   <div class="row">
+         <div class="col-md-6">
+            <div class="image">
+               <a href="https://hlblawyers.com.au"><img src="https://hlblawyers.com.au/wp-content/uploads/2021/08/logo.jpg"></a>
+            </div>
+         </div>
+         <div class="col-md-6">
+            <div class="et_extitdash">
+               <button type="button" class="exit_dashbord" >
+                  <?php 
+                  if (is_user_logged_in()) : ?>
+                  <a href="<?php echo $gotoEditulr; ?>">Exit to Dashboard</a>
+                  <?php 
+                  endif;?>            
+               </button>
+            </div>   
+         </div>
+         <div class="spacer"></div>
+   </div>
+
+   <div class="row title-row">
+      <div class="col-md-7 offset-md-0 col-12">
+         <h3>Who will administer your estate?</h3>
+      </div>
+      <div class="col-md-4 offset-md-1 col-12">
+         <h3></h3>
+      </div>               
+   </div>
+
+   <div class="row">
+      <div class="col-md-7 col-12 ">
+        <form id="executor_step1_form" class="executor1_form content_box_sections" action="" method="post" novalidate="novalidate">
+            <a href="<?php echo $gotoEditulr.'?will=pets'; ?>"><span class="p-chip">Pets </span></a>
+            <input type="hidden" id="userid" name="userid" value="<?php echo $user_id; ?>">
+            <h4 class="mt_20">Executors</h4>
+            <p class="mt-3">
+               An executor is a person or professional service provider appointed under the Will to administer your estate after your death.<br><br>
+
+               <strong>What are the duties of an Executor?</strong><br>
+               An executor is responsible for collecting and protecting estate assets, paying estate liabilities and distributing the assets of the estate to the beneficiaries in accordance with the Will.<br><br>
+               The Willed platform allows you to pick up to 3 primary executors. You also have the option to choose up to 3 backup options if you wish.<br>
+            </p>
+            <p>
+               <strong>Note:</strong> Whilst you may appoint an executor who resides outside of Australia, logistical challenges may flow from such appointment. Therefore, it is generally recommended to appoint an executor residing within Australia.
+            </p>
+            <p>Click <strong>Continue</strong> to select your executors.</p>
+            <div class="secion_sv_div" style="position: relative;">
+               <button type="button" class="section_next_btn" id="executor_continue_btn">Continue</button>
+            </div>
+         </form>
+
+          <!---------- Primary -------->
+         <form id="executor_step2_form" class="executor2_form content_box_sections" action="" method="post" novalidate="novalidate" style="display:none;">
+            <span href="" class="back_to_main_executor"><span class="p-chip">Back </span></span>
+            <input type="hidden" id="userid" name="userid" value="<?php echo $user_id; ?>">
+            <h4 class="mt_20">Primary executors</h4>      
+            <div class="age_under_yes primary_executor_main_name_addtional">        
+               <ul>
+                  <li>Select 1 to 3 people as primary executor</li>
+                  <li>Choose people who are 18 years or older</li>
+               </ul>
+               <div id="gurdian_addtional" class="primary_exector_addtional married_addtional <?php if(empty($primaryExedata)){echo 'err_active';} ?>" >
+                  <span id="hiddenPrimarExeName" class=""></span>
+                  <?php  
+                  if(!empty($exename)){
+                     $totalGurdain = count($exename);
+                     ?>
+
+                     <div class="gardian_added">
+                        <?php
+                        foreach($exename as $key=>$values){
+                        ?>
+                           <div class="guardian_names_dv primary_exec_names_div">
+                              <input type="text" data-attr="<?php echo  $key; ?>" data-value="<?php echo $values; ?>" data-id="<?php echo $user_id;?>" name="primary_executors[]" id="" class="child_gurdian_names primary_executors" value="<?php echo $values; ?>" disabled><span class="edit_primary_exe_name" id="edit_primary_exe_name"><i class="fa fa-pencil" aria-hidden="true"></i></span><span id="del_primary_exe_name" class="delete_pet del_primary_exe_name"><i class="fa fa-times" aria-hidden="true"></i></span>
+                           </div>
+                        <?php 
+                        }
+                        ?>  
+                     </div>
+                     <?php 
+                     if( $totalGurdain ==3){
+                     ?>
+                        <div style="opacity:0.2;" class="add_additional_partner add_guardian_disabled" >Add a Executor</div>
+                     <?php     
+                     }  else {
+                     } 
+                  } ?>
+                  <div style="<?php if( $totalGurdain ==3){ echo 'display: none;'; } else { echo 'display: block;';  }?>" class="add_additional_partner " id="add_primary_executor" >Add a Executor</div>
+                  <span style="display: none;" class="wf_error_mesg wf_error_executor_name_hidden">Required field</span>
+               </div>
+            </div>
+            <div class="secion_sv_div" style="position: relative;">
+               <button type="button" class="section_next_btn" id="primary_exec_submit">Next</button>
+               <span id="loader_imagedv_partner_popup" style="display: none;"><img class="image_loader partner_save_loading" src="<?php echo CD_PLUGIN_URL . 'assets/images/loader_img.jpg'; ?>"></span>
+            </div>
+         </form>
+
+         <!---------- Backup -------------->
+         <form id="executor_step3_form" class="executor3_form content_box_sections" action="" method="post" novalidate="novalidate" style="display:none;">
+            <span href="" class="back_to_primary_executors"><span class="p-chip">Back </span></span>
+            <input type="hidden" id="userid" name="userid" value="<?php echo $user_id; ?>">
+            <h4 class="mt_20">Backup executors</h4>  
+            <p>In case your primary executor predeceases you or is otherwise unable to act, a backup executor is a person appointed under the Will to administer your estate after your death. We recommend appointing backup executors.</p>   
+            <div class="age_under_yes primary_executor_main_name_addtional_bkp">        
+               <ul>
+                  <li>Backup executors are optional</li>
+                  <li>Maximum of 3 selections</li>
+                  <li>Choose people who are 18 years or older</li>
+                  <li>Select in order of priority</li>
+               </ul>
+               <div id="gurdian_addtional" class="primary_exector_addtional_bkp married_addtional <?php if(empty($backupExedata)){echo 'err_active';} ?>" >
+                  <span id="hiddenPrimarExeName_bkp" class=""></span>
+                  <?php  
+                  if(!empty($bkupExe)){
+                     $totalGurdain_bkp = count($bkupExe);
+                     ?>
+                     <div class="gardian_added">
+                        <?php
+                        foreach($bkupExe as $key=>$values){
+                        ?>
+                           <div class="guardian_names_dv primary_exec_names_div_bkp">
+                              <input type="text" data-attr="<?php echo  $key; ?>" data-value="<?php echo $values; ?>" data-id="<?php echo $user_id;?>" name="primary_executors_bkp[]" id="" class="child_gurdian_names primary_executors_bkp" value="<?php echo $values; ?>" disabled><span class="edit_pet edit_primary_exe_name_bkp" id="edit_primary_exe_name_bkp"><i class="fa fa-pencil" aria-hidden="true"></i></span><span id="del_primary_exe_name_bkp" class="delete_pet del_primary_exe_name_bkp"><i class="fa fa-times" aria-hidden="true"></i></span>
+                           </div>
+                        <?php 
+                        }
+                        ?>  
+                     </div>
+                     <?php 
+                     if( $totalGurdain_bkp ==3){
+                     ?>
+                        <div style="opacity:0.2;" class="add_additional_partner add_guardian_disabled_bkp" >Add a Executor</div>
+                     <?php     
+                     }  else {
+                     } 
+                  } ?>
+                  <div style="<?php if( $totalGurdain_bkp ==3){ echo 'display: none;'; } else { echo 'display: block;';  }?>" class="add_additional_partner " id="add_primary_executor_bkp" >Add a Executor</div>
+                  <span style="display: none;" class="wf_error_mesg wf_error_executor_name_hidden">Required field</span>
+               </div>
+            </div>
+            <div class="secion_sv_div" style="position: relative;">
+               <button type="button" class="section_next_btn" id="primary_exec_submit_bkp">Save</button>
+               <span id="loader_imagedv_partner_popup" style="display: none;"><img class="image_loader partner_save_loading" src="<?php echo CD_PLUGIN_URL . 'assets/images/loader_img.jpg'; ?>"></span>
+            </div>
+         </form>  
+
+         <!---------- Identify ececutors -------------->
+         <form id="executor_step4_form" class="executor4_form content_box_sections" action="" method="post" novalidate="novalidate" style="display:none;">
+            <span class="back_to_backup_executors"><span class="p-chip">Back </span></span>
+            <input type="hidden" id="userid" name="userid" value="<?php echo $user_id; ?>">
+            <h4 class="mt_20">Identify Executors</h4>
+            <p>It is important that the people you nominated as your Executors are correctly identified. By providing their current addresses you will be able to avoid any confusion later on.</p>
+            <p>If you are not sure of an address you can leave it blank for now and enter it later.</p>
+            <strong>Addresses</strong>
+            <div class="gardian_added_indetiyf">
+               <?php
+               $get_allIdentify_executorsData =  get_user_meta( $user_id, 'identify_executor_submitted_data', true );
+               if(!empty($get_allIdentify_executorsData)){
+                  foreach($get_allIdentify_executorsData['indentify_executor_data'] as $key=>$valuesIdend){
+                     $value_exe_name = $valuesIdend['indentify_executor_name'];
+                     $value_exe_Add = $valuesIdend['indentify_executor_address']; 
+                  ?>
+                     <div class="guardian_names_dv identify_exec_names_div not_empty_indenfy">
+                        <input type="text" data-attr="<?php echo  $key; ?>" data-value="<?php echo $value_exe_name; ?>" data-id="<?php echo $user_id;?>" name="indentify_executors_name[]" id="" class="child_gurdian_names indentify_executors_name" value="<?php echo $value_exe_name; ?>" disabled>
+                        <span class="append_address"><?php echo $value_exe_Add; ?></span><input value="<?php echo $value_exe_Add; ?>" class="inputappend_address" type="hidden" name="identify_address[]"><span class="edit_pet edit_indentify_exe_name" id="edit_indentify_exe_name"><i class="fa fa-pencil" aria-hidden="true"></i></span>
+                     </div>
+                  <?php 
+                  }
+
+               } else {
+                  $get_allPrimary_executorsData =  get_user_meta( $user_id, 'primary_executor_submitted_data', true );
+                  $allprmnameArr = $get_allPrimary_executorsData['primary_executor_name'];
+                  $get_allbackup_executorsData =  get_user_meta( $user_id, 'backup_executor_submitted_data', true );
+                  $allbkpnameArr = $get_allbackup_executorsData['backup_executor_name']; 
+                  $combine_PrimaryAndBakupExec = array_merge($allprmnameArr,$allbkpnameArr);
+                  
+                  foreach($combine_PrimaryAndBakupExec as $key=>$values){
+                  ?>
+                     <div class="guardian_names_dv identify_exec_names_div">
+                        <input type="text" data-attr="<?php echo  $key; ?>" data-value="<?php echo $values; ?>" data-id="<?php echo $user_id;?>" name="indentify_executors_name[]" id="" class="child_gurdian_names indentify_executors_name" value="<?php echo $values; ?>" disabled>
+                        <span class="append_address"></span><input class="inputappend_address" type="hidden" name="identify_address[]"><span class="edit_pet edit_indentify_exe_name" id="edit_indentify_exe_name"><i class="fa fa-pencil" aria-hidden="true"></i></span>
+                     </div>
+                  <?php 
+                  }
+               }
+               ?>  
+            </div>
+            <div class="secion_sv_div" style="position: relative;">
+               <button type="button" class="section_next_btn" id="indentify_exec_submit">Next</button>
+               <span id="loader_imagedv_idendtify_execr_popup" style="display: none;"><img class="image_loader partner_save_loading" src="<?php echo CD_PLUGIN_URL . 'assets/images/loader_img.jpg'; ?>"></span>
+            </div>
+         </form> 
+      </div>
+
+      <div class="col-md-4 offset-md-1 col-12">
+         <div class="dashbaord_sidebar_section">
+         <?php include(CD_PLUGIN_PATH. '/templates/edit-wfaccount/wf-sidebar-menu.php');  ?>
+         <!--col-md-4 offset-md-1 col-12   end  -->
+      </div>
+   </div>
+
+   <!-- Primary executors -->
+      <nav class="sidenavbar" id="sidenav_add_primary_executor" style="display: none;">
+         <div class="sidenav_close-btn">
+            <span class="close_primary_executor"><i class="fa fa-close"></i></span>
+            <h3>Select partner</h3>
+         </div>
+         <hr class="divider">   
+         <?php 
+         $partners_data = get_user_meta($user_id, 'willed_partners', true);
+         if(!empty($partners_data)){
+            echo '<div class="partner_itemslist primaryExecutr_itemList">';
+            foreach($partners_data as $key => $partners_d){
+               echo '<p data-attr="'.$user_id.'"  data-value="'.$partners_d.'" class="primar_exe_items_list" data-id="'.$key.'">'.$partners_d.'</p>';  
+            }
+            echo '</div>';
+         }
+         ?>
+         <!-- <form novalidate="novalidate" class=""> -->
+         <div class="partners_popup_area">   
+            <div class="multiple_partners_area"></div>
+            <h3>Add person</h3>
+            <p>Full legal name</p>
+            <input id="add_prm_execText_input" name="add_partner_name" placeholder="" type="text">
+            <span style="display: none;" class="wf_error_mesg">Required field</span>
+            <input value="<?php echo $user_id; ?>" id="add_prm_exe_userid" name="" type="hidden">
+            <div class="secion_sv_div" style="position: relative;">
+               <button type="button" class="" id="primary_exe_new_save_btn" style="" >Save</button><span id="loader_imagedv_partner_popup" class="loader_imagedv_primary_exe_popup" style="display: none;"><img class="image_loader partner_save_loading" src="<?php echo CD_PLUGIN_URL . 'assets/images/loader_img.jpg'; ?>"></span>
+            </div>
+            <hr class="divider">
+         </div>
+
+         <!-- </form>       -->
+      </nav>
+      <div id="primary_executor_name_modal"></div>
+
+
+      <!-- Backup executors -->
+      <nav class="sidenavbar" id="sidenav_add_primary_executor_bkp" style="display: none;">
+         <div class="sidenav_close-btn">
+            <span class="close_primary_executor"><i class="fa fa-close"></i></span>
+            <h3>Select partner</h3>
+         </div>
+         <hr class="divider">   
+         <?php 
+         $partners_data = get_user_meta($user_id, 'willed_partners', true);
+         if(!empty($partners_data)){
+            echo '<div class="partner_itemslist primaryExecutr_itemList">';
+            foreach($partners_data as $key => $partners_d){
+               echo '<p data-attr="'.$user_id.'"  data-value="'.$partners_d.'" class="primar_exe_items_list_bkp" data-id="'.$key.'">'.$partners_d.'</p>';  
+            }
+            echo '</div>';
+         }
+         ?>
+         <!-- <form novalidate="novalidate" class=""> -->
+         <div class="partners_popup_area">   
+            <div class="multiple_partners_area"></div>
+            <h3>Add person</h3>
+            <p>Full legal name</p>
+            <input id="add_prm_execText_input_bkp" name="add_partner_name" placeholder="" type="text">
+            <span style="display: none;" class="wf_error_mesg">Required field</span>
+            <input value="<?php echo $user_id; ?>" id="add_prm_exe_userid_bkp" name="" type="hidden">
+            <div class="secion_sv_div" style="position: relative;">
+               <button type="button" class="" id="primary_exe_new_save_btn_bkp" style="" >Save</button><span id="loader_imagedv_partner_popup" class="loader_imagedv_bakcupExe_popup" style="display: none;"><img class="image_loader partner_save_loading" src="<?php echo CD_PLUGIN_URL . 'assets/images/loader_img.jpg'; ?>"></span>
+            </div>
+            <hr class="divider">
+         </div>
+
+         <!-- </form>       -->
+      </nav>
+      <div id="primary_executor_name_modal_bkp"></div>
+
+      <div id="identify_executor_name_modal"></div>
+
+
+      
