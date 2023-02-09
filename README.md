@@ -2,13 +2,13 @@
 /** ---Legal-Will Form Documentation--- **/                                                                                                                               
 By this application, Write a Will online and get peace of mind for you and your loved ones.
 
-1. Create a Willed Account:
+1. Create a Willed Account:                                                                                                                                               
 Create a Willed Account by answering a few simple questions.
 
-2. Tell us about your partner and children:
+2. Tell us about your partner and children:                                                                                                                               
 If you are married or in a de facto relationship, tell us about your partner. If you have children, tell us about your children. If your children are under 18 years of age, you should consider appointing a guardian to care for your children in the event you and your partner pass away.
 
-3. Appoint your executors:
+3. Appoint your executors:                                                                                                                                               
 The executor is the person appointed by you to carry out your wishes after you pass away. The duties of an executor can be demanding, so it is important that you carefully select people who you trust. Consider appointing a backup executor just in case.
 
 4. Leave gifts:
