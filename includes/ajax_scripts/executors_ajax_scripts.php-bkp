@@ -1,0 +1,591 @@
+<script type="text/javascript">
+jQuery(document).ready(function() {
+	//var searchInputvvv = jQuery(document).find('#identify_exec_addresst');
+	var executor_dahsbaordajax = '<?php echo admin_url('admin-ajax.php');?>';
+	/***************************Pets submit*****************************/
+
+
+	/****************End primary executors******************/
+	//next sections
+	jQuery('#executor_continue_btn').click(function(){
+		jQuery('#executor_step2_form').show();
+		jQuery('#executor_step1_form').hide();
+	});
+	//previous section 
+	jQuery('.back_to_main_executor').click(function(){
+		jQuery('#executor_step1_form').show();
+		jQuery('#executor_step2_form').hide();
+	});
+	jQuery('.back_to_primary_executors').click(function(){
+		jQuery('#executor_step2_form').show();
+		jQuery('#executor_step3_form').hide();
+	});
+
+	jQuery('.back_to_backup_executors').click(function(){
+		jQuery('#executor_step3_form').show();
+		jQuery('#executor_step4_form').hide();
+	});
+
+
+
+	//==============================================================================//
+	//Add primary executor data
+	jQuery(document).on('click', '#primary_exec_submit', function(e) {
+		e.preventDefault();
+		var wf_userid = jQuery('#userid').val();
+	 	if( jQuery(".primary_exector_addtional").hasClass("err_active") ){
+			jQuery(this).prop('disabled',true);
+			jQuery(this).attr('style','border-color: #ccc;background-color: #c1c6d0!important;color: #fff!important;');
+			jQuery('.wf_error_executor_name_hidden').show();
+			return false;
+		} else {
+			var primary_executors_values = jQuery("input[name='primary_executors[]']").map(function(){return $(this).val();}).get();
+			jQuery.ajax({
+				type : "post",
+		        url : executor_dahsbaordajax,
+		        data : { 
+		    		'action': 'primary_executor_data_save',
+		    		'wf_userid':wf_userid,
+		    		'primary_exe_names':primary_executors_values
+				},
+				beforeSend: function(){
+				    jQuery('#primary_exec_submit').parent().find("#loader_imagedv_partner_popup").show();
+				    jQuery('#primary_exec_submit').addClass('submit_disable');
+				},
+		    	success: function(response12) {
+		    		var myArray = JSON.parse(response12);
+		    		jQuery('#primary_exec_submit').parent().find("#loader_imagedv_partner_popup").hide();
+				    jQuery('#primary_exec_submit').removeClass('submit_disable');
+		    		if(myArray.msg == "primary_exe_data_saved"){
+		    			jQuery('#executor_step2_form').hide();
+		    			jQuery('#executor_step3_form').show();
+		    		}
+		        }
+			});
+		}
+	});
+
+	jQuery('body').on('click','#add_primary_executor', function(){
+		jQuery('#sidenav_add_primary_executor').show(); 
+	});
+	jQuery('.close_primary_executor').click(function(){
+		jQuery('#sidenav_add_primary_executor ').css('display','none');
+	}); 
+
+	//select primary Executor
+	jQuery(document).find('.primar_exe_items_list').each(function(){
+		jQuery(this).click(function(){
+			var countprimaryExec = jQuery(document).find(".primary_executor_main_name_addtional").find(".primary_exec_names_div").length;
+			if(countprimaryExec==0){
+				jQuery("#primary_exec_submit").prop('disabled',false);
+				jQuery("#primary_exec_submit").removeAttr('style');
+				jQuery("#primary_exec_submit").removeAttr('disabled');
+				jQuery('.wf_error_executor_name_hidden').hide();
+			}
+			if(countprimaryExec>=2){
+				jQuery('.primary_executor_main_name_addtional').find('#add_primary_executor').addClass('primary_exec_disabled');
+				jQuery(document).find('.primary_executor_main_name_addtional').removeClass('err_active');
+			} 
+			var primarExecName = jQuery(this).text();
+			var appnedGuradnhtml = '<div id="gudraianNameCont" class="primary_exec_names_div guardian_names_dv gudraianNameCont"><input name="primary_executors[]" type="text" class="child_gurdian_names" id="petgudrianname" disabled value="'+primarExecName+'"><span class="edit_primary_exe_name" id="edit_primary_exe_name"><i class="fa fa-pencil" aria-hidden="true"></i></span><span id="del_primary_exe_name" class="delete_pet del_primary_exe_name"><i class="fa fa-times" aria-hidden="true"></i></span></div>';
+			jQuery(".primary_executor_main_name_addtional").removeClass("errorAct");
+			jQuery('body').find('#hiddenPrimarExeName').append(appnedGuradnhtml);
+			setTimeout(function() {
+				jQuery('#sidenav_add_primary_executor').hide();
+			},300);
+		});
+	});
+
+
+	//Add new Executor(partner) in list 
+	jQuery('#primary_exe_new_save_btn').click(function(e){
+		e.preventDefault();
+		if(jQuery('#add_prm_execText_input').val()==''){
+			jQuery('#add_prm_execText_input').parent().find('.wf_error_mesg').show();
+			return false;
+		} else{
+			jQuery('#add_prm_execText_input').parent().find('.wf_error_mesg').hide();	
+			var partnernameexe = jQuery('#add_prm_execText_input').val()		
+			var add_partner_userid = jQuery('#add_prm_exe_userid').val();
+			jQuery('.wf_error_guardian_name_hidden').hide();
+			jQuery.ajax({
+				type : "post",
+		        url : executor_dahsbaordajax,
+		        data : { 'action': 'add_new_prm_exec', 'partnername':partnernameexe, 'userid':add_partner_userid},
+		        beforeSend: function(){
+				    jQuery('#primary_exe_new_save_btn').parent().find(".loader_imagedv_primary_exe_popup").show();
+				    jQuery('#primary_exe_new_save_btn').addClass('submit_disable');
+				},
+		        success:function(response16){
+	        	 	jQuery('#primary_exe_new_save_btn').parent().find(".loader_imagedv_primary_exe_popup").hide();
+				    jQuery('#primary_exe_new_save_btn').removeClass('submit_disable');
+	        	 	var resArray = JSON.parse(response16);
+	        		if(resArray.msg == 'prm_exec_update' || resArray.msg == 'prm_exec_update'){
+	        			var rtprimarExecName = resArray.retrunPrm_exec_name;
+	        			var rtcountprimaryExec = jQuery(document).find(".primary_executor_main_name_addtional").find(".primary_exec_names_div").length;
+						if(rtcountprimaryExec==0){
+							jQuery("#primary_exec_submit").prop('disabled',false);
+							jQuery("#primary_exec_submit").removeAttr('style');
+							jQuery("#primary_exec_submit").removeAttr('disabled');
+							jQuery('.wf_error_executor_name_hidden').hide();
+						} else if(rtcountprimaryExec>=2){
+							jQuery('.primary_executor_main_name_addtional').find('#add_primary_executor').addClass('primary_exec_disabled');
+							jQuery(document).find('.primary_executor_main_name_addtional').removeClass('err_active');
+						} 
+						var rtappnedGuradnhtml = '<div id="gudraianNameCont" class="primary_exec_names_div guardian_names_dv gudraianNameCont"><input name="primary_executors[]" type="text" class="child_gurdian_names" id="petgudrianname" disabled value="'+rtprimarExecName+'"><span class="edit_primary_exe_name" id="edit_primary_exe_name"><i class="fa fa-pencil" aria-hidden="true"></i></span><span id="del_primary_exe_name" class="delete_pet del_primary_exe_name"><i class="fa fa-times" aria-hidden="true"></i></span></div>';
+						jQuery(".primary_executor_main_name_addtional").removeClass("errorAct");
+						jQuery('body').find('#hiddenPrimarExeName').append(rtappnedGuradnhtml);
+						setTimeout(function() {
+							jQuery('#add_prm_execText_input').val('');
+							jQuery('#sidenav_add_primary_executor').hide();
+						},300);
+			       	} 
+		        }
+		    });
+		}
+	}); 
+	jQuery('body').on('keyup', '#add_prm_execText_input',function(e){
+		if(jQuery('#add_prm_execText_input').val()==''){
+			jQuery('#add_prm_execText_input').parent().find('.wf_error_mesg').show();
+			jQuery("#primary_exe_new_save_btn").prop('disabled',true);
+			jQuery("#primary_exe_new_save_btn").attr('style','border-color: #ccc;background-color: #c1c6d0!important;color: #fff!important;');
+			return false;
+		} else{
+			jQuery('#add_prm_execText_input').parent().find('.wf_error_mesg').hide();	
+			jQuery("#primary_exe_new_save_btn").prop('disabled',false);
+			jQuery("#primary_exe_new_save_btn").removeAttr('style');
+			return true		
+		}
+	});
+
+	//Edit Primary executor
+	jQuery("body").on("click", ".edit_primary_exe_name", function(){
+	//jQuery('.edit_primary_exe_name').each(function(){
+		//jQuery(this).click(function(){
+			//jQuery(this).click(function(){
+			var editInputval = jQuery(this).parent().find('input').val();
+			var editInputIndex = jQuery(this).parent().find('input').attr('data-attr');
+			var wf_userid = jQuery('#userid').val();
+			var popuphtml = '<div class="modal fade" id="basicModa8" tabindex="-1" role="dialog" aria-labelledby="basicModa8" aria-hidden="true"><div class="modal-dialog">  <div class="modal-content">  <div class="modal-header"><h4 class="modal-title" id="myModalLabel">Edit Person</h4> <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><form action="" method="post"><div class="modal-body"> <h3>Full legal name</h3><input type="hidden" name="index" value="'+ editInputIndex +'" id="user_index_prm_exec" class="user_index_prm_exec"><input type="hidden" name="user_id" value="'+wf_userid+'" id="user_id"><input type="hidden" name="petguardian_old_name" value="'+editInputval+'" id="prime_exec_old_name"><input type="text" data-val="'+editInputval+'" name="update_partner_name" id="upd_primary_exec_name" class="upd_primary_exec_name" value="'+editInputval+'"><span style="display: none;" class="wf_error_mesg">Required field</span></div> <div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button><button type="submit" class="btn btn-primary save_editpetguardian" name="upd_action" id="save_editprimaryExe">Save</button><span id="loader_imagedv_partner_popup" class="loader_imagedv_executor_popup" style="display: none;"><img class="image_loader partner_save_loading" src="https://hlblawyers.com.au/wp-content/plugins/willed/assets/images/loader_img.jpg"></span></div></div></div></form></div>';
+		 	jQuery('#primary_executor_name_modal').html(popuphtml);
+	        jQuery("#basicModa8").modal('show');
+			//});
+		//});
+	});
+
+	//save updated prime executor name popup
+	jQuery('body').on('click','#save_editprimaryExe', function(e) {
+		e.preventDefault();
+		var editInputvalprmExe = jQuery(this).parent().parent().find('#upd_primary_exec_name').val();
+		var prime_exec_old_name = jQuery(this).parent().parent().find('#prime_exec_old_name').val();
+		var row_indexid = jQuery(this).parent().parent().find('#user_index_prm_exec').val();
+		var wf_userid = jQuery(this).parent().parent().find('#user_id').val();
+		if(editInputvalprmExe.length>0){ 	
+			jQuery('#save_editprimaryExe').removeAttr('style');
+			jQuery('#save_editprimaryExe').prop('disabled',false);
+			jQuery('body').find('#primary_executor_name_modal').find('.wf_error_mesg').hide();
+			jQuery.ajax({
+				type : "post",
+		        url : executor_dahsbaordajax,
+		        data : { 'action': 'upda_prm_executor_name', 'primaryExe_val':editInputvalprmExe, 'userid':wf_userid,'primaryExe_old_name':prime_exec_old_name},
+		        beforeSend: function(){
+				    jQuery(document).find(".loader_imagedv_executor_popup").show();
+				    jQuery(this).addClass('submit_disable');
+				},
+		       	success:function(res){	
+		       		jQuery(document).find(".loader_imagedv_executor_popup").hide();
+				    jQuery(this).removeClass('submit_disable');
+		        	var resArray = JSON.parse(res);
+		        	if(resArray.msg == 'prmExec_popupDataSave'){
+		        	 	jQuery.each(jQuery('.primary_executors'), function (index, item) {
+	        		 		if(index==row_indexid){
+	        		 			jQuery(item).attr('value', resArray.primary_exec_name);
+	        		 		}
+					    });
+	        			jQuery('#basicModa8').modal('hide');
+		        	}
+		        }
+		    });	
+		} else {
+			jQuery('document').find('#primary_executor_name_modal').find('.wf_error_mesg').show();	
+			jQuery('#save_editprimaryExe').prop('disabled',true);
+			jQuery('#save_editprimaryExe').attr('style','border-color: #ccc;background-color: #c1c6d0!important;color: #fff!important;');
+			//jQuery('#wf_edit_pet_type').parent().find('.wf_error_mesg').show();
+			return false;   
+		}
+	});
+
+	//edit gudrdian name on popup
+	jQuery('body').on('keyup', '.upd_primary_exec_name',function(){
+		var upd_partVal = jQuery(this).val();
+		if(upd_partVal.length>0){ 	
+			jQuery('#primary_executor_name_modal').find('.wf_error_mesg').hide();
+			jQuery('#save_editprimaryExe').prop('disabled',false);
+			jQuery('#save_editprimaryExe').removeAttr('style');
+		} else {
+			jQuery('#primary_executor_name_modal').find('.wf_error_mesg').show();
+			jQuery('#save_editprimaryExe').prop('disabled',true);
+			jQuery('#save_editprimaryExe').attr('style','border-color: #ccc;background-color: #c1c6d0!important;color: #fff!important;');	
+			return false;   
+		}
+	});
+
+
+	//delte div of primary executor name
+	jQuery(document).on('click', '.del_primary_exe_name', function(){
+	 	if (!confirm("Do you want to delete")){
+      		return false;
+	    } else {
+			if(jQuery(this).parent().remove()){
+				var countprimaryonDel = jQuery(".primary_executor_main_name_addtional").find(".primary_exec_names_div").length;
+				if(countprimaryonDel<3){
+					jQuery("#primary_exec_submit").prop('disabled',true);
+					jQuery("#primary_exec_submit").attr('style','border-color: #ccc;background-color: #c1c6d0!important;color: #fff!important;');
+					jQuery('.add_guardian_disabled').css('display', 'none');
+					jQuery('.primary_executor_main_name_addtional').find('#add_primary_executor').css('display', 'block');
+					jQuery(document).find('.primary_executor_main_name_addtional').addClass('err_active');
+					jQuery('.primary_executor_main_name_addtional').find('#add_primary_executor').removeClass('primary_exec_disabled');
+				} 
+				if(countprimaryonDel>=1) {	
+					jQuery("#primary_exec_submit").prop('disabled',false);
+					jQuery("#primary_exec_submit").removeAttr('style');
+					jQuery(document).find('.primary_executor_main_name_addtional').removeClass('err_active');
+				}
+			}
+		}
+	});
+	/****************End primary executors******************/
+
+
+	/****************Start Backup executors******************/
+	//Add Backup executor data
+	jQuery(document).on('click', '#primary_exec_submit_bkp', function(e) {
+		e.preventDefault();
+		var wf_userid_bkp = jQuery('#userid').val();
+	 	if( jQuery(".primary_exector_addtional_bkp").hasClass("err_active") ){
+			jQuery(this).prop('disabled',true);
+			jQuery(this).attr('style','border-color: #ccc;background-color: #c1c6d0!important;color: #fff!important;');
+			jQuery('.wf_error_executor_name_hidden').show();
+			return false;
+		} else {
+			var primary_executors_values_bkp = 
+			jQuery(document).find('body').find(".primary_exector_addtional_bkp").find("input[name='primary_executors_bkp[]']").map(function(){
+				return jQuery(this).val();
+			}).get();
+			//console.log(primary_executors_values_bkp);
+			jQuery.ajax({
+				type : "post",
+		        url : executor_dahsbaordajax,
+		        data : { 
+		    		'action': 'backup_executor_data_save',
+		    		'wf_userid':wf_userid_bkp,
+		    		'backup_exe_names':primary_executors_values_bkp
+				},
+				beforeSend: function(){
+				    jQuery('#primary_exec_submit_bkp').parent().find("#loader_imagedv_partner_popup").show();
+				    jQuery('#primary_exec_submit_bkp').addClass('submit_disable');
+				},
+		    	success: function(response12) {
+		    		var myArray = JSON.parse(response12);
+		    		jQuery('#primary_exec_submit_bkp').parent().find("#loader_imagedv_partner_popup").hide();
+				    jQuery('#primary_exec_submit_bkp').removeClass('submit_disable');
+		    		if(myArray.msg == "backup_exe_data_saved"){
+		    			jQuery('#executor_step3_form').hide();
+		    			jQuery('#executor_step4_form').show();
+		    		}
+		        }
+			});
+		}
+	});
+
+	jQuery('#add_primary_executor_bkp').click(function(){
+		jQuery('#sidenav_add_primary_executor_bkp').show(); 
+	});
+	jQuery('.close_primary_executor').click(function(){
+		jQuery('#sidenav_add_primary_executor_bkp ').css('display','none');
+	}); 
+
+	//select Backup Executor
+	jQuery(document).find('.primar_exe_items_list_bkp').each(function(){
+		jQuery(this).click(function(){
+			var countprimaryExec = jQuery(document).find(".primary_executor_main_name_addtional_bkp").find(".primary_exec_names_div_bkp").length;
+			if(countprimaryExec==0){
+				jQuery("#primary_exec_submit_bkp").prop('disabled',false);
+				jQuery("#primary_exec_submit_bkp").removeAttr('style');
+				jQuery("#primary_exec_submit_bkp").removeAttr('disabled');
+				jQuery('.wf_error_executor_name_hidden').hide();
+			}
+			if(countprimaryExec>=2){
+				jQuery('.primary_executor_main_name_addtional_bkp').find('#add_primary_executor_bkp').addClass('primary_exec_disabled');
+				jQuery(document).find('.primary_executor_main_name_addtional_bkp').removeClass('err_active');
+			} 
+			var primarExecName = jQuery(this).text();
+			var appnedGuradnhtml = '<div id="gudraianNameCont" class="primary_exec_names_div_bkp guardian_names_dv gudraianNameCont"><input name="primary_executors_bkp[]" type="text" class="child_gurdian_names" id="petgudrianname" disabled value="'+primarExecName+'"><span class="edit_pet edit_primary_exe_name_bkp" id="edit_primary_exe_name_bkp"><i class="fa fa-pencil" aria-hidden="true"></i></span><span id="del_primary_exe_name_bkp" class="delete_pet del_primary_exe_name_bkp"><i class="fa fa-times" aria-hidden="true"></i></span></div>';
+			jQuery(".primary_executor_main_name_addtional_bkp").removeClass("errorAct");
+			jQuery('body').find('#hiddenPrimarExeName_bkp').append(appnedGuradnhtml);
+			setTimeout(function() {
+				jQuery('#sidenav_add_primary_executor_bkp').hide();
+			},300);
+		});
+	});
+
+
+	//Add new Backup exec(partner) in list 
+	jQuery('#primary_exe_new_save_btn_bkp').click(function(e){
+		e.preventDefault();
+		if(jQuery('#add_prm_execText_input_bkp').val()==''){
+			jQuery('#add_prm_execText_input_bkp').parent().find('.wf_error_mesg').show();
+			return false;
+		} else{
+			jQuery('#add_prm_execText_input_bkp').parent().find('.wf_error_mesg').hide();	
+			var partnernamebkp = jQuery('#add_prm_execText_input_bkp').val()		
+			var add_partner_userid = jQuery('#add_prm_exe_userid_bkp').val();
+			jQuery('.wf_error_guardian_name_hidden').hide();
+			jQuery.ajax({
+				type : "post",
+		        url : executor_dahsbaordajax,
+		        data : { 'action': 'add_new_bkp_exec', 'bkp_exector_name':partnernamebkp, 'userid':add_partner_userid},
+		        beforeSend: function(){
+				    jQuery('#primary_exe_new_save_btn_bkp').parent().find(".loader_imagedv_bakcupExe_popup").show();
+				    jQuery('#primary_exe_new_save_btn_bkp').addClass('submit_disable');
+				},
+		        success:function(response16){
+	        	 	jQuery('#primary_exe_new_save_btn_bkp').parent().find(".loader_imagedv_bakcupExe_popup").hide();
+				    jQuery('#primary_exe_new_save_btn_bkp').removeClass('submit_disable');
+	        	 	var resArray = JSON.parse(response16);
+	        		if(resArray.msg == 'bkp_exec_added' || resArray.msg == 'bkp_exec_update'){
+	        			var rtbackupExecName = resArray.retrunbkp_exec_name;
+	        			var rtcountBackupExec = jQuery(document).find(".primary_executor_main_name_addtional_bkp").find(".primary_exec_names_div_bkp").length;
+						if(rtcountBackupExec==0){
+							jQuery("#primary_exec_submit_bkp").prop('disabled',false);
+							jQuery("#primary_exec_submit_bkp").removeAttr('style');
+							jQuery("#primary_exec_submit_bkp").removeAttr('disabled');
+							jQuery('.wf_error_executor_name_hidden').hide();
+						} else if(rtcountBackupExec>=2){
+							jQuery('.primary_executor_main_name_addtional_bkp').find('#add_primary_executor_bkp').addClass('primary_exec_disabled');
+							jQuery(document).find('.primary_executor_main_name_addtional_bkp').removeClass('err_active');
+						} 
+						var rtappnedBkpExechtml = '<div id="gudraianNameCont" class="primary_exec_names_div_bkp guardian_names_dv gudraianNameCont"><input name="primary_executors_bkp[]" type="text" class="child_gurdian_names" id="petgudrianname" disabled value="'+rtbackupExecName+'"><span class="edit_pet edit_primary_exe_name_bkp" id="edit_primary_exe_name_bkp"><i class="fa fa-pencil" aria-hidden="true"></i></span><span id="del_primary_exe_name_bkp" class="delete_pet del_primary_exe_name_bkp"><i class="fa fa-times" aria-hidden="true"></i></span></div>';
+						jQuery(".primary_executor_main_name_addtional_bkp").removeClass("errorAct");
+						jQuery('body').find('#hiddenPrimarExeName_bkp').append(rtappnedBkpExechtml);
+						setTimeout(function() {
+							jQuery('#add_prm_execText_input_bkp').val('');
+							jQuery('#sidenav_add_primary_executor_bkp').hide();
+						},300);
+			       	} 
+		        }
+		    });
+		}
+	}); 
+	jQuery('body').on('keyup', '#add_prm_execText_input_bkp',function(e){
+		if(jQuery('#add_prm_execText_input_bkp').val()==''){
+			jQuery('#add_prm_execText_input_bkp').parent().find('.wf_error_mesg').show();
+			jQuery("#primary_exe_new_save_btn_bkp").prop('disabled',true);
+			jQuery("#primary_exe_new_save_btn_bkp").attr('style','border-color: #ccc;background-color: #c1c6d0!important;color: #fff!important;');
+			return false;
+		} else{
+			jQuery('#add_prm_execText_input_bkp').parent().find('.wf_error_mesg').hide();	
+			jQuery("#primary_exe_new_save_btn_bkp").prop('disabled',false);
+			jQuery("#primary_exe_new_save_btn_bkp").removeAttr('style');
+			return true		
+		}
+	});
+
+	//Edit Backup executor
+	jQuery("body").on("click", ".edit_primary_exe_name_bkp", function(){
+	//jQuery(document).find('.primary_executor_main_name_addtional_bkp .edit_primary_exe_name_bkp').each(function(){
+		//jQuery(this).click(function(){
+			//alert();
+			//jQuery(this).click(function(){
+			var editInputval = jQuery(this).parent().find('input').val();
+			var editInputIndex = jQuery(this).parent().find('input').attr('data-attr');
+			var wf_userid = jQuery('#userid').val();
+			var popuphtml = '<div class="modal fade" id="basicModa7" tabindex="-1" role="dialog" aria-labelledby="basicModa7" aria-hidden="true"><div class="modal-dialog">  <div class="modal-content">  <div class="modal-header"><h4 class="modal-title" id="myModalLabel">Edit Person</h4> <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><form action="" method="post"><div class="modal-body"> <h3>Full legal name</h3><input type="hidden" name="index" value="'+ editInputIndex +'" id="user_index_prm_exec" class="user_index_prm_exec"><input type="hidden" name="user_id" value="'+wf_userid+'" id="user_id"><input type="hidden" name="petguardian_old_name" value="'+editInputval+'" id="bakup_exec_old_name"><input type="text" data-val="'+editInputval+'" name="update_partner_name" id="upd_primary_exec_name_bkp" class="upd_primary_exec_name_bkp" value="'+editInputval+'"><span style="display: none;" class="wf_error_mesg">Required field</span></div> <div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button><button type="submit" class="btn btn-primary save_editpetguardian" name="upd_action" id="save_editbkpExe">Save</button><span id="loader_imagedv_partner_popup" class="loader_imagedv_executor_popup" style="display: none;"><img class="image_loader partner_save_loading" src="https://hlblawyers.com.au/wp-content/plugins/willed/assets/images/loader_img.jpg"></span></div></div></div></form></div>';
+		 	jQuery(document).find('#primary_executor_name_modal_bkp').html(popuphtml);
+	        jQuery("#basicModa7").modal('show');
+			//});
+		//});
+	});
+
+	//save updated Backup executor name popup
+	jQuery('body').on('click','#save_editbkpExe', function(e) {
+		e.preventDefault();
+		var editInputvalbkpExe = jQuery(this).parent().parent().find('#upd_primary_exec_name_bkp').val();
+		var bakup_exec_old_name = jQuery(this).parent().parent().find('#bakup_exec_old_name').val();
+		var bkprow_indexid = jQuery(this).parent().parent().find('#user_index_prm_exec').val();
+		var wf_userid_bkp = jQuery(this).parent().parent().find('#user_id').val();
+		if(editInputvalbkpExe.length>0){ 	
+			jQuery('#save_editbkpExe').removeAttr('style');
+			jQuery('#save_editbkpExe').prop('disabled',false);
+			jQuery('body').find('#primary_executor_name_modal_bkp').find('.wf_error_mesg').hide();
+			jQuery.ajax({
+				type : "post",
+		        url : executor_dahsbaordajax,
+		        data : { 'action': 'upda_bkp_executor_name', 'backupExe_val':editInputvalbkpExe, 'userid':wf_userid_bkp,'backupExe_old_name':bakup_exec_old_name},
+		        beforeSend: function(){
+				    jQuery(document).find(".loader_imagedv_executor_popup").show();
+				    jQuery(this).addClass('submit_disable');
+				},
+		       	success:function(response17){	
+		       		jQuery(document).find(".loader_imagedv_executor_popup").hide();
+				    jQuery(this).removeClass('submit_disable');
+		        	var resArray = JSON.parse(response17);
+		        	if(resArray.msg == 'bkpExec_popupDataSave'){
+		        	 	jQuery.each(jQuery('.primary_executors_bkp'), function (index, item) {
+	        		 		if(index==bkprow_indexid){
+	        		 			jQuery(item).attr('value', resArray.backup_exec_name);
+	        		 		}
+					    });
+	        			jQuery('#basicModa7').modal('hide');
+		        	}
+		        }
+		    });	
+		} else {
+			jQuery('document').find('#primary_executor_name_modal_bkp').find('.wf_error_mesg').show();	
+			jQuery('#save_editbkpExe').prop('disabled',true);
+			jQuery('#save_editbkpExe').attr('style','border-color: #ccc;background-color: #c1c6d0!important;color: #fff!important;');
+			//jQuery('#wf_edit_pet_type').parent().find('.wf_error_mesg').show();
+			return false;   
+		}
+	});
+
+	//edit Backup executor name on popup
+	jQuery('body').on('keyup', '.upd_primary_exec_name_bkp',function(){
+		var upd_partVal = jQuery(this).val();
+		if(upd_partVal.length>0){ 	
+			jQuery('#primary_executor_name_modal_bkp').find('.wf_error_mesg').hide();
+			jQuery('#save_editbkpExe').prop('disabled',false);
+			jQuery('#save_editbkpExe').removeAttr('style');
+		} else {
+			jQuery('#primary_executor_name_modal_bkp').find('.wf_error_mesg').show();
+			jQuery('#save_editbkpExe').prop('disabled',true);
+			jQuery('#save_editbkpExe').attr('style','border-color: #ccc;background-color: #c1c6d0!important;color: #fff!important;');	
+			return false;   
+		}
+	});
+
+
+	//delte div of Backup executor name
+	jQuery(document).on('click', '.del_primary_exe_name_bkp', function(){
+	 	if (!confirm("Do you want to delete")){
+      		return false;
+	    } else {
+			if(jQuery(this).parent().remove()){
+				var countprimaryonDel = jQuery(".primary_executor_main_name_addtional_bkp").find(".primary_exec_names_div_bkp").length;
+				if(countprimaryonDel<3){
+					jQuery("#primary_exec_submit_bkp").prop('disabled',true);
+					jQuery("#primary_exec_submit_bkp").attr('style','border-color: #ccc;background-color: #c1c6d0!important;color: #fff!important;');
+					jQuery('.add_guardian_disabled_bkp').css('display', 'none');
+					jQuery('.primary_executor_main_name_addtional_bkp').find('#add_primary_executor_bkp').css('display', 'block');
+					jQuery(document).find('.primary_executor_main_name_addtional_bkp').addClass('err_active');
+					jQuery('.primary_executor_main_name_addtional_bkp').find('#add_primary_executor_bkp').removeClass('primary_exec_disabled');
+				} 
+				if(countprimaryonDel>=1) {	
+					jQuery("#primary_exec_submit_bkp").prop('disabled',false);
+					jQuery("#primary_exec_submit_bkp").removeAttr('style');
+					jQuery(document).find('.primary_executor_main_name_addtional_bkp').removeClass('err_active');
+				}
+			}
+		}
+	});
+
+
+	/***************************Identify executor for address************************/
+	//Edit Identify executor poup
+	jQuery("body").on("click", ".edit_indentify_exe_name", function(){
+		var editInputvalIdenty = jQuery(this).parent().find('input').val();
+		var editInputIndex = jQuery(this).parent().find('input').attr('data-attr');
+		var identifyName = jQuery(this).parent().find('input').attr('data-attr');
+		var identify_exec_locationas =jQuery(this).parent().find('.append_address').text(); 
+		if(identify_exec_locationas !=''){
+			identify_exec_location = identify_exec_locationas
+		} else {
+			identify_exec_location = '';
+		}
+		var wf_userid = jQuery('#userid').val();
+		var popuphtml = '<div class="modal fade" id="basicModa9" tabindex="-1" role="dialog" aria-labelledby="basicModa9" aria-hidden="true"><div class="modal-dialog">  <div class="modal-content">  <div class="modal-header"><h4 class="modal-title" id="myModalLabel">Save Address</h4> <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><form action="" method="post"><div class="modal-body"> <h3>Address</h3><input type="hidden" name="index" value="'+ editInputIndex +'" id="user_index_indentify_exec" class="user_index_indentify_exec"><input type="hidden" name="identifyName" value="'+ editInputvalIdenty +'" id="identifyName" class="identifyName"><input type="hidden" name="user_id" value="'+wf_userid+'" id="user_id"><input type="text" class="identify_exec_address" id="identify_exec_address" value="'+identify_exec_location+'"></div> <div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button><button type="submit" class="btn btn-primary save_indentify_address" name="upd_action" id="save_indentify_address">Save</button><span id="loader_imagedv_partner_popup" class="loader_imagedv_executor_popup" style="display: none;"><img class="image_loader partner_save_loading" src="https://hlblawyers.com.au/wp-content/plugins/willed/assets/images/loader_img.jpg"></span></div></div></div></form></div>';
+	 	jQuery(document).find('#identify_executor_name_modal').html(popuphtml);
+        jQuery("#basicModa9").modal('show');
+	});
+
+	//save address in identify executor popup
+	jQuery('body').on('click','#save_indentify_address', function(e) {
+		e.preventDefault();
+		var identify_address_val = jQuery(this).parent().parent().find('.identify_exec_address').val();
+		var identifyrow_nameVal = jQuery(this).parent().parent().find('#identifyName').val();
+		var identifyrow_indexid = jQuery(this).parent().parent().find('#user_index_indentify_exec').val();
+		var wf_userid_indentyf = jQuery(this).parent().parent().find('#user_id').val();
+		jQuery.each(jQuery('.indentify_executors_name'), function (index, item) {
+	 		if(index==identifyrow_indexid){
+	 			jQuery(item).next().text(identify_address_val);
+	 			jQuery(item).next().next().val(identify_address_val);
+	 			jQuery('#basicModa9').modal('hide');
+	 		}
+	    });
+	});
+
+	jQuery(document).on('click', '#indentify_exec_submit', function(e) {
+		e.preventDefault();
+		var totalAdddivs = jQuery('.identify_exec_names_div').length;
+		var wf_userid_indetify = jQuery('#userid').val();
+		var identify_executors_name_values = jQuery(document).find('body').find(".gardian_added_indetiyf").find("input[name='indentify_executors_name[]']").map(function(){return jQuery(this).val();}).get();
+		var identify_executors_address_val = jQuery(document).find('body').find(".gardian_added_indetiyf").find("input[name='identify_address[]']").map(function(){return jQuery(this).val();}).get();
+		jQuery.ajax({
+			type : "post",
+	        url : executor_dahsbaordajax,
+	        data : { 
+	    		'action': 'indentify_executor_data_save',
+	    		'wf_userid':wf_userid_indetify,
+	    		'total_Addres_row':totalAdddivs,
+	    		'identify_exe_names':identify_executors_name_values,
+	    		'identify_exe_address':identify_executors_address_val,	
+			},
+			beforeSend: function(){
+			    jQuery('#indentify_exec_submit').parent().find("#loader_imagedv_idendtify_execr_popup").show();
+			    jQuery('#indentify_exec_submit').addClass('submit_disable');
+			},
+	    	success: function(response18) {
+	    		var myArray = JSON.parse(response18);
+	    		jQuery('#indentify_exec_submit').parent().find("#loader_imagedv_idendtify_execr_popup").hide();
+			    jQuery('#indentify_exec_submit').removeClass('submit_disable');
+	    		if(myArray.msg == "IdentifyExec_popupDataSave"){
+	    			var base_url = window.location.origin;
+					nextpageurl = base_url+'/wfdashboard/?'+'will=divideEstate';
+	    			window.location.replace(nextpageurl);
+	    		}
+	        }
+		});
+	});
+
+
+	//Get google location address
+	jQuery(document).on('keyup', '.identify_exec_address', function(){
+		initlocMap();		 
+	});
+
+	function initlocMap(){
+		//jQuery(document).find('.pac-container').css('z-index','999!important');
+		var searchInputvvv = document.getElementById("identify_exec_address");
+	    var autocomplete;
+	    autocomplete = new google.maps.places.Autocomplete( searchInputvvv , {
+	        types: ['geocode'],
+	    });	
+	}
+
+	
+}); //document end
+
+
+	
+	
+	//jQuery(document).ready(function () {
+		//var searchInputvvv = document.getElementById("identify_exec_address");
+		//var searchInput = 'identify_exec_addresst';
+		//var searchInputvvv = $('#identify_exec_addresst');
+	    //var autocomplete;
+	    //autocomplete = new google.maps.places.Autocomplete( searchInputvvv , {
+	        //types: ['geocode'],
+	   // });	 
+	//});
+
+</script>
